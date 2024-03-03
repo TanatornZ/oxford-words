@@ -9,7 +9,7 @@ export default function Home() {
   const [tableRows, setTableRows] = useState<any[]>([]);
   const [filter, setFilter] = useState("verb");
 
-  const TABLE_HEAD = ["no", "word", "class", "level"];
+  const TABLE_HEAD = ["no", "word", "class", "level", ""];
   const FILTER = [
     "verb",
     "adjective",
@@ -43,8 +43,8 @@ export default function Home() {
     setTableRows(newData);
   }, []);
 
-  const onClick = (word: string, type: string) => {
-    const index = findIndex(tableRows, { word, class: type });
+  const onClick = (row: any) => {
+    const index = findIndex(tableRows, row);
 
     const newData = clone(tableRows);
     newData[index].ready = !newData[index]?.ready;
@@ -52,7 +52,7 @@ export default function Home() {
     setTableRows(newData);
   };
 
-  const TABLE_ROWS = useMemo(() => {
+  const tableRowFilters = useMemo(() => {
     const data = tableRows.filter(
       (row: any) => row.class === filter && !row?.ready
     );
@@ -62,7 +62,7 @@ export default function Home() {
 
   return (
     <div className="container m-auto mt-10">
-      <Typography>Total Words: {TABLE_ROWS.length}</Typography>
+      <Typography>Total Words: {tableRowFilters.length}</Typography>
 
       <div className="w-72 my-5">
         <Select
@@ -98,12 +98,11 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {TABLE_ROWS?.map(({ word, class: type, level }, index) => {
+            {tableRowFilters?.map((row, index) => {
               return (
                 <tr
-                  key={word}
+                  key={index}
                   className="even:bg-blue-gray-50/50 text-xl h-[40px] hover:bg-orange-200/50"
-                  onClick={() => onClick(word, type)}
                 >
                   <td>
                     <Typography
@@ -118,7 +117,7 @@ export default function Home() {
                       color="blue-gray"
                       className="text-xl text-center"
                     >
-                      {word}
+                      {row.word}
                     </Typography>
                   </td>
                   <td>
@@ -126,7 +125,7 @@ export default function Home() {
                       color="blue-gray"
                       className="text-xl text-center"
                     >
-                      {type}
+                      {row.class}
                     </Typography>
                   </td>
                   <td>
@@ -134,7 +133,15 @@ export default function Home() {
                       color="blue-gray"
                       className="text-xl text-center"
                     >
-                      {level}
+                      {row.level}
+                    </Typography>
+                  </td>
+                  <td
+                    onClick={() => onClick(row)}
+                    className="hover:opacity-50  cursor-pointer"
+                  >
+                    <Typography color="blue" className="text-xl text-center">
+                      Hide
                     </Typography>
                   </td>
                 </tr>
