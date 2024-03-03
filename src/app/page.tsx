@@ -1,82 +1,96 @@
 "use client";
 
-import { Card, Typography, Select, Option } from "@material-tailwind/react";
-import rows from "./words.json";
-import { useEffect, useMemo, useState } from "react";
-import { clone, findIndex } from "lodash";
+import {
+  Card,
+  Typography,
+  Select,
+  Option,
+  Button,
+} from "@material-tailwind/react";
+import { useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { Word, db } from "./db";
+import wordsJson from "../../scrapper/words.json";
+
+const TABLE_HEAD = ["no", "word", "", "level", "type"];
+const FILTER = [
+  "verb",
+  "adjective",
+  "noun",
+  "adverb",
+  "indefinite article",
+  "preposition",
+  "conjunction",
+  "exclamation",
+  "determiner",
+  "pronoun",
+  "auxiliary verb",
+  "number",
+  "modal verb",
+  "ordinal number",
+  "linking verb",
+  "definite article",
+  "infinitive marker",
+];
+const LIST = ["Oxford 3000", "Oxford 5000 excluding Oxford 3000"];
 
 export default function Home() {
-  const [tableRows, setTableRows] = useState<any[]>([]);
   const [filter, setFilter] = useState("verb");
+  const [list, setList] = useState("Oxford 3000");
 
-  const TABLE_HEAD = ["no", "word", "", "level"];
-  const FILTER = [
-    "verb",
-    "adjective",
-    "noun",
-    "adverb",
-    "indefinite article",
-    "preposition",
-    "conjunction",
-    "exclamation",
-    "determiner",
-    "pronoun",
-    "auxiliary verb",
-    "number",
-    "modal verb",
-    "ordinal number",
-    "linking verb",
-    "definite article",
-    "infinitive marker",
-  ];
+  const words = useLiveQuery(() => {
+    const ox3000 = list === LIST[0];
 
-  useEffect(() => {
-    const data = localStorage.getItem("data");
-    let newData;
-    if (!data) {
-      localStorage.setItem("data", JSON.stringify(rows));
-      newData = rows;
-    } else {
-      newData = JSON.parse(String(data));
-    }
+    return db.words
+      .filter(
+        (word) => word.type === filter && word.ox3000 === ox3000 && !word.ok
+      )
+      .toArray();
+  }, [filter, list]);
 
-    setTableRows(newData);
-  }, []);
-
-  const onClick = (row: any) => {
-    const index = findIndex(tableRows, row);
-
-    const newData = clone(tableRows);
-    newData[index].ready = !newData[index]?.ready;
-
-    setTableRows(newData);
+  const onClick = (row: Word) => {
+    db.words.update(Number(row.id), { ok: true });
   };
 
-  const tableRowFilters = useMemo(() => {
-    const data = tableRows.filter(
-      (row: any) => row.class === filter && !row?.ready
-    );
-
-    return data;
-  }, [tableRows, filter]);
+  const onClear = () => {
+    db.words.clear();
+    db.words.bulkAdd(wordsJson);
+  };
 
   return (
     <div className="container m-auto mt-10">
-      <Typography>Total Words: {tableRowFilters.length}</Typography>
+      <Typography>Total Words: {words?.length}</Typography>
 
-      <div className="w-72 my-5">
-        <Select
-          value={filter}
-          onChange={(val) => setFilter(String(val))}
-          className="bg-white label:text-white"
-          size="lg"
-        >
-          {FILTER.map((value) => (
-            <Option key={value} value={value}>
-              {value}
-            </Option>
-          ))}
-        </Select>
+      <div className="flex flex-wrap mb-5">
+        <div className="w-72 my-5 mr-3">
+          <Select
+            value={filter}
+            onChange={(val) => setFilter(String(val))}
+            className="bg-white label:text-white"
+            size="lg"
+          >
+            {FILTER.map((value) => (
+              <Option key={value} value={value}>
+                {value}
+              </Option>
+            ))}
+          </Select>
+        </div>
+        <div className="w-72 my-5 mr-3">
+          <Select
+            value={list}
+            onChange={(val) => setList(String(val))}
+            className="bg-white label:text-white"
+            size="lg"
+          >
+            {LIST.map((value) => (
+              <Option key={value} value={value}>
+                {value}
+              </Option>
+            ))}
+          </Select>
+        </div>
+        <Button onClick={() => onClear()}>Reset</Button>
       </div>
       <Card className="h-full w-full overflow-scroll">
         <table className="w-full min-w-max table-auto text-left">
@@ -98,7 +112,7 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {tableRowFilters?.map((row, index) => {
+            {words?.map((row, index) => {
               return (
                 <tr
                   key={index}
@@ -134,6 +148,14 @@ export default function Home() {
                       className="text-xl text-center"
                     >
                       {row.level}
+                    </Typography>
+                  </td>
+                  <td>
+                    <Typography
+                      color="blue-gray"
+                      className="text-xl text-center"
+                    >
+                      {row.type}
                     </Typography>
                   </td>
                 </tr>
