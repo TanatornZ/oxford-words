@@ -9,7 +9,7 @@ export default function Home() {
   const [tableRows, setTableRows] = useState<any[]>([]);
   const [filter, setFilter] = useState("verb");
 
-  const TABLE_HEAD = ["no", "word", "class", "level", ""];
+  const TABLE_HEAD = ["no", "word", "", "level"];
   const FILTER = [
     "verb",
     "adjective",
@@ -120,12 +120,12 @@ export default function Home() {
                       {row.word}
                     </Typography>
                   </td>
-                  <td>
-                    <Typography
-                      color="blue-gray"
-                      className="text-xl text-center"
-                    >
-                      {row.class}
+                  <td
+                    onClick={() => onClick(row)}
+                    className="hover:opacity-50  cursor-pointer"
+                  >
+                    <Typography color="blue" className="text-xl text-center">
+                      OK
                     </Typography>
                   </td>
                   <td>
@@ -134,14 +134,6 @@ export default function Home() {
                       className="text-xl text-center"
                     >
                       {row.level}
-                    </Typography>
-                  </td>
-                  <td
-                    onClick={() => onClick(row)}
-                    className="hover:opacity-50  cursor-pointer"
-                  >
-                    <Typography color="blue" className="text-xl text-center">
-                      Hide
                     </Typography>
                   </td>
                 </tr>
