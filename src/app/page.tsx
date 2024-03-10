@@ -134,6 +134,8 @@ export default function Home() {
 
       <Button onClick={() => playAudio(word?.pronounce)}>Play</Button>
 
+      <ReactAudioPlayer src={word?.pronounce} autoPlay />
+
       <Card className="mt-6 text-white/50 " color="gray">
         <CardBody>
           <Popover open={openPopover} handler={setOpenPopover}>
@@ -149,7 +151,6 @@ export default function Home() {
               {...triggers}
               className="z-50 w-full  max-w-screen-md bg-white/90"
             >
-              <ReactAudioPlayer src={word?.pronounce} autoPlay />
               <Iframe
                 url={`https://dict.longdo.com/mobile.php?search=${word?.word}`}
                 className="w-full aspect-video"
