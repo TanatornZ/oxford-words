@@ -17,6 +17,7 @@ import { Word, db } from "./db";
 import wordsJson from "../../scrapper/words.json";
 import { sample } from "lodash";
 import Iframe from "react-iframe";
+import ReactAudioPlayer from "react-audio-player";
 
 const FILTER = ["verb", "adjective", "noun", "adverb", "other"];
 const LIST = ["Oxford 3000", "Oxford 5000 excluding Oxford 3000"];
@@ -142,6 +143,12 @@ export default function Home() {
               {...triggers}
               className="z-50 w-full  max-w-screen-md bg-white/90"
             >
+              <ReactAudioPlayer
+                src={word?.pronounce}
+                autoPlay
+                controls
+                className="mb-5"
+              />
               <Iframe
                 url={`https://dict.longdo.com/mobile.php?search=${word?.word}`}
                 className="w-full aspect-video"

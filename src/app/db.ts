@@ -10,6 +10,7 @@ export interface Word {
   ox3000: boolean;
   ox5000: boolean;
   ok?: boolean;
+  pronounce: string;
 }
 
 export class MySubClassedDexie extends Dexie {
@@ -18,7 +19,7 @@ export class MySubClassedDexie extends Dexie {
   constructor() {
     super("oxDatabase");
     this.version(1).stores({
-      words: "++id, word, type, level, ox3000, ox5000, ok", // Primary key and indexed props
+      words: "++id, word, type, level, ox3000, ox5000, ok, pronounce", // Primary key and indexed props
     });
   }
 }

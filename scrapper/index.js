@@ -18,8 +18,13 @@ fs.readFile(path.join(__dirname, "data.txt"), async (err, data) => {
       const word = data.querySelector("a")?.text || "-";
       const type = data.querySelector("span")?.text || "-";
       const level = data.querySelector("div span")?.text || "-";
+      const pronouncePath =
+        data.querySelector("div .pron-us").getAttribute("data-src-mp3") || "-";
 
-      result.push({ word, type, level, ox3000, ox5000, translate });
+      const pronounce =
+        "https://www.oxfordlearnersdictionaries.com" + pronouncePath;
+
+      result.push({ word, type, level, ox3000, ox5000, pronounce });
     }
   }
 
