@@ -7,15 +7,17 @@ import {
   Option,
   Button,
   CardBody,
-  CardFooter,
+  Popover,
+  PopoverHandler,
+  PopoverContent,
 } from "@material-tailwind/react";
 import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Word, db } from "./db";
 import wordsJson from "../../scrapper/words.json";
 import { sample } from "lodash";
+import Iframe from "react-iframe";
 
-const TABLE_HEAD = ["no", "word", "", "level", "type"];
 const FILTER = ["verb", "adjective", "noun", "adverb", "other"];
 const LIST = ["Oxford 3000", "Oxford 5000 excluding Oxford 3000"];
 
@@ -23,6 +25,13 @@ export default function Home() {
   const [filter, setFilter] = useState("verb");
   const [list, setList] = useState("Oxford 3000");
   const [word, setWord] = useState<Word>();
+
+  const [openPopover, setOpenPopover] = useState(false);
+
+  const triggers = {
+    onMouseEnter: () => setOpenPopover(true),
+    onMouseLeave: () => setOpenPopover(false),
+  };
 
   const words = useLiveQuery(async () => {
     const ox3000 = list === LIST[0];
@@ -69,7 +78,7 @@ export default function Home() {
             value={filter}
             onChange={(val) => setFilter(String(val))}
             size="lg"
-            className="text-white/50 bg-gray-900"
+            className="text-white/50 bg-gray-900 border-0"
           >
             {FILTER.map((value) => (
               <Option key={value} value={value}>
@@ -83,7 +92,8 @@ export default function Home() {
             value={list}
             onChange={(val) => setList(String(val))}
             size="lg"
-            className="text-white/50 bg-gray-900"
+            className="text-white/50 bg-gray-900 border-0"
+            labelProps={{ border: "none" }}
           >
             {LIST.map((value) => (
               <Option key={value} value={value}>
@@ -118,9 +128,26 @@ export default function Home() {
 
       <Card className="mt-6 text-white/50 " color="gray">
         <CardBody>
-          <Typography variant="h2" className="mb-2">
-            {word?.word || "-"}
-          </Typography>
+          <Popover open={openPopover} handler={setOpenPopover}>
+            <PopoverHandler {...triggers}>
+              <Typography
+                variant="h2"
+                className="mb-2 cursor-help max-w-fit hover:text-white"
+              >
+                {word?.word || "-"}
+              </Typography>
+            </PopoverHandler>
+            <PopoverContent
+              {...triggers}
+              className="z-50 w-full  max-w-screen-md bg-white/90"
+            >
+              <Iframe
+                url={`https://dict.longdo.com/mobile.php?search=${word?.word}`}
+                className="w-full aspect-video"
+              />
+            </PopoverContent>
+          </Popover>
+
           <Typography>level: {word?.level}</Typography>
           <Typography>type: {word?.type}</Typography>
         </CardBody>

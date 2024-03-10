@@ -26,6 +26,11 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+body > div.p-2.m-auto.max-w-screen-md > div.flex.flex-wrap.mb-5 > div > div > label {
+  display: none;
+}
+
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
