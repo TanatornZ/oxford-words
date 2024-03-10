@@ -71,6 +71,10 @@ export default function Home() {
     setWord(sample(words));
   };
 
+  const playAudio = (audio?: string) => {
+    new Audio(audio).play();
+  };
+
   return (
     <div className="p-2 m-auto max-w-screen-md ">
       <div className="flex flex-wrap mb-5">
@@ -128,6 +132,8 @@ export default function Home() {
         Skip
       </Button>
 
+      <Button onClick={() => playAudio(word?.pronounce)}>Play</Button>
+
       <Card className="mt-6 text-white/50 " color="gray">
         <CardBody>
           <Popover open={openPopover} handler={setOpenPopover}>
@@ -143,12 +149,7 @@ export default function Home() {
               {...triggers}
               className="z-50 w-full  max-w-screen-md bg-white/90"
             >
-              <ReactAudioPlayer
-                src={word?.pronounce}
-                autoPlay
-                controls
-                className="mb-5"
-              />
+              <ReactAudioPlayer src={word?.pronounce} autoPlay />
               <Iframe
                 url={`https://dict.longdo.com/mobile.php?search=${word?.word}`}
                 className="w-full aspect-video"
