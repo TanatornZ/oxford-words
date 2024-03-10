@@ -17,7 +17,7 @@ import { Word, db } from "./db";
 import wordsJson from "../../scrapper/words.json";
 import { sample } from "lodash";
 import Iframe from "react-iframe";
-import ReactAudioPlayer from "react-audio-player";
+import { useHotkeys } from "react-hotkeys-hook";
 
 const FILTER = ["verb", "adjective", "noun", "adverb", "other"];
 const LIST = ["Oxford 3000", "Oxford 5000 excluding Oxford 3000"];
@@ -57,23 +57,28 @@ export default function Home() {
     return data;
   }, [filter, list]);
 
-  const onClick = (row?: Word) => {
-    if (!row) return;
-    db.words.update(Number(row.id), { ok: true });
-  };
-
   const onClear = () => {
     db.words.clear();
     db.words.bulkAdd(wordsJson);
+  };
+
+  const onOkay = () => {
+    if (!word) return;
+    db.words.update(Number(word.id), { ok: true });
   };
 
   const onSkip = () => {
     setWord(sample(words));
   };
 
-  const playAudio = (audio?: string) => {
-    new Audio(audio).play();
+  const playAudio = () => {
+    if (!word) return;
+    new Audio(word.pronounce).play();
   };
+
+  useHotkeys("a", () => onOkay());
+  useHotkeys("d", () => onSkip());
+  useHotkeys("space", () => playAudio());
 
   return (
     <div className="p-2 m-auto max-w-screen-md ">
@@ -118,25 +123,23 @@ export default function Home() {
       </Typography>
 
       <Button
-        onClick={() => onClick(word)}
+        onClick={() => onOkay()}
         color="blue"
-        className="mr-5 text-white/50 "
+        className="mr-5 text-white "
       >
         OK
       </Button>
       <Button
         onClick={() => onSkip()}
         color="deep-orange"
-        className="mr-5 text-white/50 "
+        className="mr-5 text-white "
       >
         Skip
       </Button>
 
-      <Button onClick={() => playAudio(word?.pronounce)}>Play</Button>
+      <Button onClick={() => playAudio()}>Play</Button>
 
-      <ReactAudioPlayer src={word?.pronounce} autoPlay />
-
-      <Card className="mt-6 text-white/50 " color="gray">
+      <Card className="mt-6 text-white/50 mb-5" color="gray">
         <CardBody>
           <Popover open={openPopover} handler={setOpenPopover}>
             <PopoverHandler {...triggers}>
@@ -162,6 +165,19 @@ export default function Home() {
           <Typography>type: {word?.type}</Typography>
         </CardBody>
       </Card>
+
+      <div className="text-white/50">
+        <Typography>Shortcuts</Typography>
+        <Typography>
+          press <span className="font-bold text-xl">(A)</span> : OK
+        </Typography>
+        <Typography>
+          press <span className="font-bold text-xl">(D)</span> : Skip
+        </Typography>
+        <Typography>
+          press <span className="font-bold text-xl">(Space)</span> : Pronounce
+        </Typography>
+      </div>
     </div>
   );
 }
