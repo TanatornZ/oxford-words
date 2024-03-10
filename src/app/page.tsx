@@ -79,6 +79,7 @@ export default function Home() {
             onChange={(val) => setFilter(String(val))}
             size="lg"
             className="text-white/50 bg-gray-900 border-0"
+            labelProps={{ style: { display: "none" } }}
           >
             {FILTER.map((value) => (
               <Option key={value} value={value}>
@@ -93,7 +94,7 @@ export default function Home() {
             onChange={(val) => setList(String(val))}
             size="lg"
             className="text-white/50 bg-gray-900 border-0"
-            labelProps={{ border: "none" }}
+            labelProps={{ style: { display: "none" } }}
           >
             {LIST.map((value) => (
               <Option key={value} value={value}>
